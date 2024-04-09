@@ -62,5 +62,5 @@ allure serve  ./reports/temp
 ```shell
 allure generate ./reports/temp -o ./reports/html --clean
 ```
-# 共同进步可以添加微信
-_**MioHu**
+# 联系我
+- 微信 ： _**MioHu**
