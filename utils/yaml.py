@@ -3,7 +3,7 @@
 import os
 import yaml.scanner
 import ruamel.yaml
-from utils.path import format_path
+from utils.path import get_path
 
 
 class Yaml:
@@ -15,7 +15,7 @@ class Yaml:
         :param: file_path:
         :return:
         """
-        file_path = format_path(file_path)
+        file_path = get_path(file_path)
         # 判断文件是否存在
         if os.path.exists(file_path):
             with open(file_path, 'r', encoding='utf-8') as data:
@@ -29,7 +29,7 @@ class Yaml:
         yaml = ruamel.yaml.YAML()
         yaml.preserve_quotes = True  # 保留引号
         yaml.indent(mapping=2, sequence=4, offset=2)  # 设置缩进
-        file_path = format_path(file_path)
+        file_path = get_path(file_path)
 
         with open(file_path, 'r') as file:
             data = yaml.load(file)  # 加载 YAML 数据

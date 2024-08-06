@@ -21,16 +21,12 @@ TEMP_REPORT_DIR = os.path.join(REPORT_DIR, "temp")
 # HTML测试报告目录
 HTML_REPORT_DIR = os.path.join(REPORT_DIR, "html")
 
-def format_path(path: Text) -> Text:
-    """兼容 windows 和 linux 不同环境的操作系统路径 """
+def get_path(path: str):
     if "/" in path:
-        path = os.sep.join(path.split("/"))
-    if "\\" in path:
-        path = os.sep.join(path.split("\\"))
-    if ROOT_DIR in path:
-        return path
+        path = path.split("/")
+    elif "\\" in path:
+        path = path.split("\\")
     else:
-        return ROOT_DIR + path
-
-
+        path = [path]
+    return os.path.join(ROOT_DIR, *path)
 

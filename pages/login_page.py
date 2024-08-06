@@ -1,11 +1,10 @@
-import allure
-from playwright.sync_api import Page
+from pages import *
 
 
-class LoginPage:
+class LoginPage(PageObject):
     def __init__(self, page: Page):
-        self.page = page
-        self._path = "/account/sign_in"
+        super().__init__(page)
+        self.url = "/account/sign_in"
         self._username_input = page.get_by_placeholder("用户名 / Email")
         self._password_input = page.get_by_placeholder("密码")
         self._login_button = page.locator('//*[@value="登录"]')
@@ -13,10 +12,11 @@ class LoginPage:
 
     @allure.step("导航到登录页面")
     def navigate(self):
-        self.page.goto(self._path)
+        self.page.goto(self.url)
 
     @allure.step("输入账号密码并提交")
     def login(self, username: str, password: str):
         self._username_input.fill(username)
         self._password_input.fill(password)
-        self._login_button.click()
+        self.click_button("登录")
+        # self._login_button.click()

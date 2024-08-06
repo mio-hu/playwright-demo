@@ -1,7 +1,5 @@
-import allure
+from testcases import *
 from pages.login_page import LoginPage
-from playwright.sync_api import Page, expect
-from conf.config import base_config
 
 
 @allure.feature("测试登录成功")

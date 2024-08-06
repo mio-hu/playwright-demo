@@ -1,11 +1,11 @@
-import allure
-from playwright.sync_api import Page
+from pages import *
 
 
-class CommunityPage:
+class CommunityPage(PageObject):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
-        self._path = "/topics"
+        self.url = "/topics"
         self.avatar_img = page.locator('.avatar-32')
         self.nav_menu = page.locator('.nav-pills')
         self.create_topic_button = page.locator('.btn-primary')
@@ -20,7 +20,7 @@ class CommunityPage:
 
     @allure.step("导航到社区页面")
     def navigate(self):
-        self.page.goto(self._path)
+        self.page.goto(self.url)
 
     @allure.step("点击新建文章按钮")
     def goto_create_topic_page(self):
