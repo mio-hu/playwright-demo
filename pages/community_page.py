@@ -1,5 +1,5 @@
 from pages import *
-
+import allure
 
 class CommunityPage(PageObject):
     def __init__(self, page: Page):

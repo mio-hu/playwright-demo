@@ -2,7 +2,6 @@
 
 
 import os
-from typing import Text
 
 # 项目的跟路径
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,6 +19,8 @@ REPORT_DIR = os.path.join(ROOT_DIR, "reports")
 TEMP_REPORT_DIR = os.path.join(REPORT_DIR, "temp")
 # HTML测试报告目录
 HTML_REPORT_DIR = os.path.join(REPORT_DIR, "html")
+# 数据库配置文件
+DB_CONF_PATH = os.path.join(CONF_DIR, "bd-config.yaml")
 
 def get_path(path: str):
     if "/" in path:

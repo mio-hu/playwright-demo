@@ -1,4 +1,5 @@
 from pages import *
+import allure
 
 
 class LoginPage(PageObject):
