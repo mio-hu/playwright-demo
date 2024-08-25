@@ -22,6 +22,7 @@ class CommunityPage(PageObject):
     def navigate(self):
         self.page.goto(self.url)
 
+
     @allure.step("点击新建文章按钮")
     def goto_create_topic_page(self):
         self.create_topic_button.click()

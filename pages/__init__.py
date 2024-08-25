@@ -1,10 +1,11 @@
 import os
 import allure
-from playwright.sync_api import Page, expect, BrowserContext
+from playwright.sync_api import Page, expect, BrowserContext, Locator
 from pages.base_page import PageObject
 from pages.login_page import LoginPage
 from pages.community_page import CommunityPage
 from utils.global_map import GlobalMap
+from components.table import Table
 from conf.config import base_config
 from utils.path import get_path
 from filelock import FileLock
