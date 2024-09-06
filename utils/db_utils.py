@@ -6,7 +6,7 @@ import os
 
 import pymysql
 import yaml
-from common.path import DB_CONF_PATH
+from utils.path import DB_CONF_PATH
 
 
 class DbUtils(object):

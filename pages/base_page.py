@@ -1,4 +1,7 @@
+import pytest
+
 from pages import *
+from utils.my_date import *
 
 
 class Locators:
@@ -75,8 +78,70 @@ class PageObject:
         else:
             self.locators.get_top_div_in_form(form_item_name).get_by_role("switch").set_checked(_switch_status, timeout=timeout)
 
+    def datetime_in_form(self, form_item_name: str, date: str, form_locator: Locator = None, timeout: float = None):
+        if form_locator:
+            date_locator = form_locator.locator(self.locators.get_top_div_in_form(form_item_name))
+        else:
+            date_locator = self.locators.get_top_div_in_form(form_item_name)
+
+        date_list = date.split(",")
+        for index, date_item in enumerate(date_list):
+            try:
+                format_datetime = get_datetime(int(date_item))
+            except:
+                format_datetime = date_item
+
+            date_locator.locator("input").nth(index).click(timeout=timeout)
+            date_locator.locator("input").nth(index).fill(format_datetime, timeout=timeout)
+            date_locator.locator("input").nth(index).blur(timeout=timeout)
 
 
+    def fill_form_quickly(self, form_locator: Locator = None, timeout: float = None, **kwargs):
+        for form_item, content in kwargs.items():
+            if not content:
+                continue
+            elif self.locators.get_top_div_in_form(form_item).locator(".ant-input").count():
+                self.input_in_form(form_item_name=form_item, input_text=content, form_locator=form_locator, timeout=timeout)
+            elif self.locators.get_top_div_in_form(form_item).locator(".ant-select-selector").count():
+                self.dropdown_in_form(form_item_name=form_item, select_item=content, form_locator=form_locator, timeout=timeout)
+            elif self.locators.get_top_div_in_form(form_item).locator(".ant-radio-group").count():
+                self.radio_in_form(form_item_name=form_item, select_item=content, form_locator=form_locator, timeout=timeout)
+            elif self.locators.get_top_div_in_form(form_item).get_by_role("switch").count():
+                self.switch_in_form(form_item_name=form_item, switch_status=content, form_locator=form_locator, timeout=timeout)
+            elif self.locators.get_top_div_in_form(form_item).locator(".ant-picker").count():
+                self.datetime_in_form(form_item_name=form_item, date=content, form_locator=form_locator, timeout=timeout)
+            else:
+                pytest.fail(f'不支持的快捷表单 \n{form_item}:{content}')
 
+    def fill_form_quickly_when_more_forms(self, form_locator: Locator = None, timeout: float = None, **kwargs):
+        existed_form_item_list = []
+        unique_form_item = False
+        if form_locator:
+            _form_locator = form_locator
+        else:
+            for index, item in enumerate(kwargs.keys()):
+                if index == 0:
+                    try:
+                        self.locators.get_top_div_in_form(item).last.wait_for(timeout=timeout)
+                    except:
+                        pass
 
+                if self.locators.get_top_div_in_form(item).count() == 0:
+                    continue
+                else:
+                    if self.locators.get_top_div_in_form(item) == 1:
+                        unique_form_item = True
+                    existed_form_item_list.append(self.locators.get_top_div_in_form(item))
+                if unique_form_item and len(existed_form_item_list) >= 2:
+                    break
+
+            contain_all_existed_form_items_loc = self.page.locator("*")
+            for item_loc in existed_form_item_list:
+                contain_all_existed_form_items_loc = contain_all_existed_form_items_loc.filter(has=item_loc)
+            if unique_form_item:
+                _form_locator = contain_all_existed_form_items_loc.last
+            else:
+                _form_locator = min(contain_all_existed_form_items_loc.all(), key=lambda loc: len(loc.text_content()))
+
+        self.fill_form_quickly(_form_locator, timeout=timeout, **kwargs)
 
