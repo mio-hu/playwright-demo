@@ -1,4 +1,5 @@
 import pytest
+import time
 
 from pages import *
 from utils.my_date import *
@@ -42,6 +43,28 @@ class PageObject:
     def search(self):
         # 可以尝试将你整个项目的搜索功能封装到这里
         ...
+
+    def hover_retry(self, hover_object: Locator, next_click_object: Locator, first_action="hover", second_action="click",
+                    timeout=30_000):
+        start_time = time.time()
+        while True:
+            if time.time() - start_time > timeout / 1000:
+                pytest.fail(f"hover重试{hover_object.__str__()}在{timeout / 1000}秒内未成功")
+            try:
+                self.page.mouse.move(x=1, y=1)
+                self.page.wait_for_timeout(1_000)
+                if first_action == "hover":
+                    hover_object.last.hover()
+                else:
+                    hover_object.last.click()
+                self.page.wait_for_timeout(3_000)
+                if second_action == "click":
+                    next_click_object.last.click(timeout=3000)
+                else:
+                    next_click_object.last.wait_for(state="visible", timeout=3000)
+                break
+            except:
+                continue
 
     def input_in_form(self, form_item_name: str, input_text: str, form_locator: Locator = None, timeout: float = None):
         if form_locator:
@@ -144,4 +167,39 @@ class PageObject:
                 _form_locator = min(contain_all_existed_form_items_loc.all(), key=lambda loc: len(loc.text_content()))
 
         self.fill_form_quickly(_form_locator, timeout=timeout, **kwargs)
+
+    @allure.step("重试")
+    def retry(self, *args, retry_numbers=10):
+        """
+        重试一系列步骤
+        @param args:
+        1. 第一个传的是子步骤的指针,比如locator.click, locator.hover
+        2. 如果只传子步骤指针,则默认执行时的timeout为3_000
+        3. 如果需要传参,则需要使用(子步骤指针, 位置参数1, 位置参数2, {"命名参数名称1": 命名参数值1, "命名参数名称2": 命名参数值2})
+        @param retry_numbers:
+        @return:
+        """
+        for _ in range(retry_numbers):
+            try:
+                for arg in args:
+                    if isinstance(arg, tuple):
+                        with allure.step(f"{arg[0].__name__} 参数:{arg[1:]}"):
+                            func = arg[0]
+                            param = arg[1:]
+                            named_params = {}
+                            positional_params = []
+                            for in_param in param:
+                                if isinstance(in_param, dict):
+                                    named_params.update(in_param)
+                                else:
+                                    positional_params.append(in_param)
+                            func(*positional_params, **named_params)
+                    else:
+                        with allure.step(arg.__name__):
+                            arg(timeout=3000)
+                break
+            except Exception as e:
+                if _ == retry_numbers - 1:
+                    print(f"已经重试{retry_numbers}次，但仍然失败，错误信息：", e)
+                    raise e
 
