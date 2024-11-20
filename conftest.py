@@ -1,6 +1,7 @@
 import re
 import hashlib
 import sys
+import time
 
 import allure
 import pytest
@@ -122,6 +123,7 @@ def new_context(
     contexts: List[BrowserContext] = []
 
     def _new_context(**kwargs: Any) -> BrowserContext:
+        browser_context_args_copy = browser_context_args.copy()
         # 获取重试的log策略并转成列表
         _rerun_strategy = pytestconfig.getoption("--rerun_strategy").split(",")
         # 获取重试次数，此处为2则为重试两次，加上第一次，一共跑三次
@@ -149,12 +151,12 @@ def new_context(
                 video_option = "off"
         # 这里只判断了video，是因为创建context时必须设置record_video_dir后才开始主动录屏
         capture_video = video_option in ["on", "retain-on-failure"]
-        browser_context_args.update(kwargs)
+        browser_context_args_copy.update(kwargs)
         if capture_video:
             video_option_dict = {"record_video_dir": _pw_artifacts_folder.name}
-            browser_context_args.update(video_option_dict)
+            browser_context_args_copy.update(video_option_dict)
 
-        my_context = browser.new_context(**browser_context_args)
+        my_context = browser.new_context(**browser_context_args_copy)
         my_context.set_default_timeout(ui_timeout)
         my_context.set_default_navigation_timeout(ui_timeout * 2)
         original_close = my_context.close
@@ -338,7 +340,7 @@ class ArtifactsRecorder:
                 try:
                     screenshot_path = (
                         # Path(self._pw_artifacts_folder.name) / create_guid()
-                        Path(self._pw_artifacts_folder.name) / page.title()
+                        Path(self._pw_artifacts_folder.name) / "".join([page.title(), str(time.time_ns())])
                     )
                     page.screenshot(
                         timeout=5000,

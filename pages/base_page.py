@@ -34,11 +34,11 @@ class PageObject:
     def base_table(self, unique_text: str, table_index: int = -1):
         return Table(self.page, unique_text, table_index)
 
-    def click_button(self, button_name, timeout=30_000):
+    def click_button(self, button_name, timeout=30_000, nth=-1):
         button_loc = self.page.get_by_role("button")
         for i in button_name:
             button_loc = button_loc.filter(has_text=i)
-        button_loc.click(timeout=timeout)
+        button_loc.nth(nth).click(timeout=timeout)
 
     def search(self):
         # 可以尝试将你整个项目的搜索功能封装到这里
