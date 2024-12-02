@@ -118,7 +118,6 @@ class PageObject:
             date_locator.locator("input").nth(index).fill(format_datetime, timeout=timeout)
             date_locator.locator("input").nth(index).blur(timeout=timeout)
 
-
     def fill_form_quickly(self, form_locator: Locator = None, timeout: float = None, **kwargs):
         for form_item, content in kwargs.items():
             if not content:
