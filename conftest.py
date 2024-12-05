@@ -324,7 +324,8 @@ class ArtifactsRecorder:
                         pass
 
     def on_did_create_browser_context(self, context: BrowserContext) -> None:
-        base_url = GlobalMap.get("baseurl")
+        # 上下文里监听,有新的page就添加到列表中
+        base_url = GlobalMap.get("base_url")
         context.on("page", lambda page: self._all_pages.append(page))
         global api_count_list
 
@@ -432,7 +433,7 @@ class Locator(_Locator):
             return " >> ".join(__selector)
 
     def __getattribute__(self, attr):
-        global api_Count
+        global api_count_list
         global time_out
         try:
             orig_attr = super().__getattribute__(attr)
@@ -451,8 +452,8 @@ class Locator(_Locator):
                             try:
                                 if attr in ["click", "fill", "hover", "check", "blur", "focus"]:
                                     self.page.wait_for_timeout(100)
-                                    api_length = len(api_Count)
-                                    if api_Count:
+                                    api_length = len(api_count_list)
+                                    if api_count_list:
                                         self.page.wait_for_timeout(200)
                                         self.page.evaluate('''() => {
                                                const spanToRemove = document.getElementById('ainotestgogogo');
@@ -525,7 +526,7 @@ class Locator(_Locator):
                                         spanToRemove.remove();
                                     }
                                 }''')
-                            escaped_api_count = json.dumps(api_Count)
+                            escaped_api_count = json.dumps(api_count_list)
                             self.page.evaluate(f'''() => {{
                                     const span = document.createElement('span');
                                     span.textContent = `当前列表内容为: {escaped_api_count}`;
@@ -542,7 +543,7 @@ class Locator(_Locator):
                                 print("接口卡超时了,暂时放行,需要查看超时接口或调整接口监听范围:")
                                 print(escaped_api_count)
                                 pass
-                            api_Count.clear()
+                            api_count_list.clear()
                             break
 
                     if step_title:
